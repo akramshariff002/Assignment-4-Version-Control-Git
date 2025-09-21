@@ -1,2 +1,2 @@
-Version 1: Change from the main branch.
+Version 2: Change from the new branch.
 
