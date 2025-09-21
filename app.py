@@ -1,16 +1,32 @@
-from flask import Flask, jsonify
+from flask import Flask, render_template, request, jsonify
+from pymongo import MongoClient
 
 app = Flask(__name__)
 
-@app.route('/api/health')
-def health():
-    return jsonify(status='ok')
+# --- MongoDB Connection Setup ---
+client = MongoClient('mongodb://localhost:27017/')
+db = client['todo_database']
+collection = db['todo_items']
+# --------------------------------
 
-@app.route('/')
-def home():
-    return '<h1>Flask Backend</h1><p>Visit /api/health for health check</p>'
+# Code from master_1
+@app.route('/todo')
+def todo_page():
+    return render_template('todo.html')
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+# Code from master_2
+@app.route('/submittodoitem', methods=['POST'])
+def submit_todo_item():
+    item_name = request.form['itemName']
+    item_description = request.form['itemDescription']
 
+    collection.insert_one({
+        'name': item_name,
+        'description': item_description
+    })
 
+    return jsonify({"status": "success", "message": "To-Do item added."})
+
+# (Add your main run block if you have one)
+# if __name__ == '__main__':
+#     app.run(debug=True)
